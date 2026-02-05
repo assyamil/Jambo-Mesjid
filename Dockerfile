@@ -1,8 +1,8 @@
 FROM php:8.2-fpm
 
-# Install system dependencies
+# System dependencies
 RUN apt-get update && apt-get install -y \
-    git curl zip unzip nodejs npm nginx \
+    git curl zip unzip nginx nodejs npm \
     && docker-php-ext-install pdo pdo_mysql
 
 WORKDIR /var/www/html
@@ -10,24 +10,17 @@ WORKDIR /var/www/html
 # Copy project
 COPY . .
 
-# Install composer
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
-RUN php artisan key:generate || true
-RUN php artisan config:clear
-RUN php artisan config:cache
 
-
-# Install node deps & build assets
+# Frontend build (Vite Laravel)
 RUN npm install
 RUN npm run build
 
-# Laravel permissions
+# Permissions (WAJIB)
 RUN chown -R www-data:www-data storage bootstrap/cache
 RUN chmod -R 775 storage bootstrap/cache
-
 
 # Nginx config
 COPY nginx.conf /etc/nginx/conf.d/default.conf
