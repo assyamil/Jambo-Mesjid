@@ -2,9 +2,10 @@
 
 namespace App\Providers;
 
+use App\Models\ProfileContent;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
-use App\Models\ProfileContent; // Pastikan ini diimport
 
 class ViewComposerServiceProvider extends ServiceProvider
 {
@@ -22,33 +23,57 @@ class ViewComposerServiceProvider extends ServiceProvider
     public function boot(): void
     {
         View::composer('*', function ($view) {
-            $footerAbout = ProfileContent::where('key', 'footer_about')->first();
-            $villageName = ProfileContent::where('key', 'village_name')->first();
-            $profileKepalaDesa = ProfileContent::where('key', 'kepala_desa')->first();
-            $contactAddress = ProfileContent::where('key', 'contact_address')->first();
-            $siteLogo = ProfileContent::where('key', 'site_logo')->first();
-            $brandPrimaryColor = ProfileContent::where('key', 'brand_primary_color_hsl')->first(); // Key yang menyimpan HEX
-            $brandSecondaryColor = ProfileContent::where('key', 'brand_secondary_color_hsl')->first();
-            $brandAccentColor = ProfileContent::where('key', 'brand_accent_color_hsl')->first();
-            $socialMediaFacebook = ProfileContent::where('key', 'social_media_facebook')->first();
-            $socialMediaInstagram = ProfileContent::where('key', 'social_media_instagram')->first();
-            $socialMediaTwitter = ProfileContent::where('key', 'social_media_twitter')->first();
-            $socialMediaTiktok = ProfileContent::where('key', 'social_media_tiktok')->first(); // <-- TAMBAHKAN INI
+            try {
+                // Ambil semua data SEKALI
+                $contents = ProfileContent::whereIn('key', [
+                    'footer_about',
+                    'village_name',
+                    'kepala_desa',
+                    'contact_address',
+                    'site_logo',
+                    'brand_primary_color_hsl',
+                    'brand_secondary_color_hsl',
+                    'brand_accent_color_hsl',
+                    'social_media_facebook',
+                    'social_media_instagram',
+                    'social_media_twitter',
+                    'social_media_tiktok',
+                ])->get()->keyBy('key');
 
-            $view->with([
-                'footerAbout' => $footerAbout,
-                'profileKepalaDesa' => $profileKepalaDesa,
-                'villageName' => $villageName,
-                'siteLogo' => $siteLogo,
-                'brandPrimaryColor' => $brandPrimaryColor,
-                'brandSecondaryColor' => $brandSecondaryColor,
-                'brandAccentColor' => $brandAccentColor,
-                'socialMediaFacebook' => $socialMediaFacebook,
-                'socialMediaInstagram' => $socialMediaInstagram,
-                'socialMediaTwitter' => $socialMediaTwitter,
-                'contactAddress' => $contactAddress,
-                'socialMediaTiktok' => $socialMediaTiktok,
-            ]);
+                $view->with([
+                    'footerAbout'           => $contents['footer_about'] ?? null,
+                    'villageName'           => $contents['village_name'] ?? null,
+                    'profileKepalaDesa'     => $contents['kepala_desa'] ?? null,
+                    'contactAddress'        => $contents['contact_address'] ?? null,
+                    'siteLogo'              => $contents['site_logo'] ?? null,
+                    'brandPrimaryColor'     => $contents['brand_primary_color_hsl'] ?? null,
+                    'brandSecondaryColor'   => $contents['brand_secondary_color_hsl'] ?? null,
+                    'brandAccentColor'      => $contents['brand_accent_color_hsl'] ?? null,
+                    'socialMediaFacebook'   => $contents['social_media_facebook'] ?? null,
+                    'socialMediaInstagram'  => $contents['social_media_instagram'] ?? null,
+                    'socialMediaTwitter'    => $contents['social_media_twitter'] ?? null,
+                    'socialMediaTiktok'     => $contents['social_media_tiktok'] ?? null,
+                ]);
+            } catch (\Throwable $e) {
+                // Log error tapi JANGAN crash website
+                Log::error('ViewComposerServiceProvider error: '.$e->getMessage());
+
+                // Fallback aman
+                $view->with([
+                    'footerAbout'           => null,
+                    'villageName'           => null,
+                    'profileKepalaDesa'     => null,
+                    'contactAddress'        => null,
+                    'siteLogo'              => null,
+                    'brandPrimaryColor'     => null,
+                    'brandSecondaryColor'   => null,
+                    'brandAccentColor'      => null,
+                    'socialMediaFacebook'   => null,
+                    'socialMediaInstagram'  => null,
+                    'socialMediaTwitter'    => null,
+                    'socialMediaTiktok'     => null,
+                ]);
+            }
         });
     }
 }
