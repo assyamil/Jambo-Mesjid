@@ -4,7 +4,6 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite",
         "start": "serve -s dist -l $PORT"
     },
     "devDependencies": {
