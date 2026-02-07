@@ -9,7 +9,7 @@
 </head>
 <body class="bg-white text-gray-800">
 
-    @include('frontend.partials.navbar')
+    @includeIf('frontend.partials.navbar')
 
     <main>
         @yield('content')
