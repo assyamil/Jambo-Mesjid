@@ -1,4 +1,6 @@
-<x-app-layout>
+@extends('layouts.frontend')
+
+@section('content')
 
 {{-- ================= HERO SLIDER ================= --}}
 @php
@@ -51,7 +53,7 @@
 
 {{-- ================= POTENSI ================= --}}
 <section class="py-20 bg-gray-100">
-    <div class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-12">Potensi Desa</h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -80,7 +82,7 @@
 
 {{-- ================= BERITA ================= --}}
 <section class="py-20 bg-white">
-    <div class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-12">Berita Terbaru</h2>
 
         <div class="grid md:grid-cols-3 gap-8">
@@ -91,7 +93,7 @@
                     @endif
                     <div class="p-5">
                         <h3 class="font-semibold mb-2">
-                            <a href="{{ route('news.show', $n->slug) }}">
+                            <a href="{{ route('news.show', $n->slug) }}" class="hover:text-accent">
                                 {{ \Illuminate\Support\Str::limit($n->title ?? '', 60) }}
                             </a>
                         </h3>
@@ -111,7 +113,7 @@
 
 {{-- ================= GALERI ================= --}}
 <section class="py-20 bg-gray-100">
-    <div class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-12">
             Galeri {{ optional($villageName)->content ?? '' }}
         </h2>
@@ -148,13 +150,15 @@
 
 {{-- ================= MAP ================= --}}
 <section class="py-20 bg-white">
-    <div class="container mx-auto">
+    <div class="max-w-7xl mx-auto px-4">
         <h2 class="text-3xl font-bold text-center mb-12">Lokasi Kantor Desa</h2>
 
         @if (!empty($googleMapsEmbedUrl))
-            <iframe src="{{ $googleMapsEmbedUrl }}"
-                    class="w-full h-96 rounded"
-                    loading="lazy"></iframe>
+            <iframe
+                src="{{ $googleMapsEmbedUrl }}"
+                class="w-full h-96 rounded border"
+                loading="lazy">
+            </iframe>
         @else
             <p class="text-center text-gray-500">
                 Lokasi belum diatur.
@@ -163,4 +167,4 @@
     </div>
 </section>
 
-</x-app-layout>
+@endsection
