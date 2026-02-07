@@ -39,48 +39,42 @@ class HomeController extends Controller
         if (Schema::hasTable('potentials')) {
             $potentials = Potential::where('is_published', true)
                 ->orderBy('order')
-                ->take(3)
+                ->limit(3)
                 ->get();
         }
 
         // ================= NEWS =================
         if (Schema::hasTable('news')) {
             $news = News::where('is_published', true)
-                ->orderBy('published_at', 'desc')
-                ->take(3)
+                ->orderByDesc('published_at')
                 ->withCount('comments')
+                ->limit(3)
                 ->get();
         }
 
         // ================= GALLERY =================
         if (Schema::hasTable('galleries')) {
             $homepageGalleries = Gallery::where('is_published', true)
-                ->orderBy('created_at', 'desc')
-                ->take(6)
+                ->orderByDesc('created_at')
                 ->with('images')
+                ->limit(6)
                 ->get();
         }
 
         // ================= PROFILE CONTENT =================
         if (Schema::hasTable('profile_contents')) {
 
-            $sekilasDesa = ProfileContent::where('key', 'sekilas_desa')->first();
+            $sekilasDesa   = ProfileContent::where('key', 'sekilas_desa')->first();
             $contactAddress = ProfileContent::where('key', 'contact_address')->first();
-            $contactPhone = ProfileContent::where('key', 'contact_phone')->first();
-            $contactEmail = ProfileContent::where('key', 'contact_email')->first();
-            $villageName = ProfileContent::where('key', 'village_name')->first();
+            $contactPhone   = ProfileContent::where('key', 'contact_phone')->first();
+            $contactEmail   = ProfileContent::where('key', 'contact_email')->first();
+            $villageName    = ProfileContent::where('key', 'village_name')->first();
 
-            // -------- GOOGLE MAPS (LAT & LNG) --------
-            $latContent = ProfileContent::where('key', 'Maps_latitude')->first();
-            $lngContent = ProfileContent::where('key', 'Maps_longitude')->first();
+            // -------- GOOGLE MAPS --------
+            $lat = ProfileContent::where('key', 'Maps_latitude')->value('content');
+            $lng = ProfileContent::where('key', 'Maps_longitude')->value('content');
 
-            if (
-                $latContent && !empty($latContent->content) &&
-                $lngContent && !empty($lngContent->content)
-            ) {
-                $lat = $latContent->content;
-                $lng = $lngContent->content;
-
+            if (!empty($lat) && !empty($lng)) {
                 $googleMapsEmbedUrl = "https://maps.google.com/maps?q={$lat},{$lng}&hl=id&z=15&output=embed";
             }
         }
